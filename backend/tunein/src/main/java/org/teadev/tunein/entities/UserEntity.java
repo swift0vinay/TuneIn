@@ -26,18 +26,17 @@ public class UserEntity implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(nullable = false)
-    private UUID uid;
+    private UUID id;
     
-    @Column(nullable = true)
     private String name;
     
     @Column(unique = true, nullable = false)
     private String email;
     
-    @Column(unique = true, nullable = true)
+    @Column(unique = true)
     private String handle;
     
-    @Column(nullable = true)
+    @Column(unique = true)
     private String mobile;
     
     @Column(nullable = false)
