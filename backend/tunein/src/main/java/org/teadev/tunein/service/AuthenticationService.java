@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.teadev.tunein.dto.request.UserLoginRequestDto;
 import org.teadev.tunein.dto.request.UserRegisterRequestDto;
 import org.teadev.tunein.entities.UserEntity;
+import org.teadev.tunein.entities.enums.RoleType;
+import org.teadev.tunein.repository.RoleRepository;
 import org.teadev.tunein.repository.UserRepository;
 
 import java.util.Optional;
@@ -27,12 +29,15 @@ public class AuthenticationService {
     @Autowired
     private AuthenticationManager authenticationManager;
     
+    @Autowired
+    private RoleRepository roleRepository;
+    
     public UserEntity register(UserRegisterRequestDto dto) {
         UserEntity userEntity = UserEntity.builder()
                 .email(dto.getUsername())
                 .password(passwordEncoder.encode(dto.getPassword()))
+                .role(roleRepository.findByRoleType(RoleType.USER).get())
                 .build();
-        log.info("trying to save a user");
         return userRepository.save(userEntity);
     }
     
@@ -45,8 +50,7 @@ public class AuthenticationService {
         );
         return userRepository
                 .findByHandleOrEmail(dto.getUsername(), dto.getUsername())
-                .orElseThrow(
-                        () -> new UsernameNotFoundException("Cannot find user with email/handle as: " + dto.getUsername()));
+                .orElseThrow(() -> new UsernameNotFoundException("Cannot find user with email/handle as: " + dto.getUsername()));
     }
     
 }

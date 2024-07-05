@@ -50,6 +50,9 @@ public class UserEntity implements UserDetails {
     @Column(name = "updated_at")
     private Date updatedAt;
     
+    @OneToOne
+    private Role role;
+    
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;
