@@ -9,10 +9,12 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.Ordered;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.teadev.tunein.constants.ErrorMessage;
 import org.teadev.tunein.dto.request.UserRegisterRequestDto;
 import org.teadev.tunein.entities.Role;
 import org.teadev.tunein.entities.UserEntity;
 import org.teadev.tunein.entities.enums.RoleType;
+import org.teadev.tunein.exceptions.RoleNotFoundException;
 import org.teadev.tunein.repository.RoleRepository;
 import org.teadev.tunein.repository.UserRepository;
 
@@ -59,15 +61,17 @@ public class AdminSeeder implements ApplicationListener<ContextRefreshedEvent>, 
         
         Optional<Role> role = roleRepository.findByRoleType(RoleType.SUPER_ADMIN);
         if (role.isEmpty()) {
-            log.warn("cannot find the required role");
-            return;
+            log.warn(ErrorMessage.ROLE_NOT_FOUND_MESSAGE);
+            throw new RoleNotFoundException(ErrorMessage.ROLE_NOT_FOUND_MESSAGE);
         }
+        
         log.info("Creating super admin");
         UserEntity userEntity = UserEntity
                 .builder()
                 .name(SUPER_ADMIN_NAME)
                 .email(SUPER_ADMIN_EMAIL)
                 .password(passwordEncoder.encode(SUPER_ADMIN_PASSWORD))
+                .role(role.get())
                 .build();
         
         userRepository.save(userEntity);
