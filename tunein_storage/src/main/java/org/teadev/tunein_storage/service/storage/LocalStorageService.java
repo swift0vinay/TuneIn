@@ -5,6 +5,7 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.teadev.tunein_storage.constants.ErrorMessage;
 import org.teadev.tunein_storage.entity.MediaItem;
@@ -21,7 +22,8 @@ import java.util.UUID;
 @Log4j2
 public class LocalStorageService implements StorageService {
     
-    final String LOCAL_STORAGE_PATH = "E:\\Spring Projects\\TuneIn\\storage";
+    @Value("${storage.root}")
+    private String LOCAL_STORAGE_PATH;
     
     @Autowired
     private StorageRepository storageRepository;
