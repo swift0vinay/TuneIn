@@ -1,9 +1,10 @@
 package org.teadev.tunein.entities;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
-import org.springframework.web.multipart.MultipartFile;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.List;
 @Table(name = "posts")
 @Entity
 @Data
+@Builder
 public class PostEntity {
     
     @Id
@@ -19,23 +21,21 @@ public class PostEntity {
     
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private UserEntity userId;
+    private UserEntity user;
     
     @Column(nullable = false)
     @CreationTimestamp
     private Date createdAt;
     
     @Column(nullable = false)
+    @UpdateTimestamp
     private Date updatedAt;
     
     @Column
     private String body;
     
-    @Transient
-    private List<MultipartFile> files;
-    
     @Column
-    private List<String> filePaths;
+    private String files;
     
     @OneToMany(cascade = CascadeType.REMOVE)
     @JoinTable(joinColumns = @JoinColumn(name = "post_id", referencedColumnName = "id"),

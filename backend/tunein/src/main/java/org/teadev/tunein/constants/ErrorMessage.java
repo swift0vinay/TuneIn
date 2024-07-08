@@ -9,4 +9,7 @@ public class ErrorMessage {
     public static final String INTERNAL_SERVER_ERROR_MESSAGE = "Unknown internal server error";
     
     public static final String ROLE_NOT_FOUND_MESSAGE = "Cannot find required role";
+    
+    public static final String FILE_UPLOAD_FAILURE = "Failure while uploading file";
+    
 }

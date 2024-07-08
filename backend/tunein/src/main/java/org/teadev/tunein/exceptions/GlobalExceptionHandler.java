@@ -35,6 +35,32 @@ public class GlobalExceptionHandler {
         return problemDetail;
     }
     
+    @ExceptionHandler(RuntimeException.class)
+    public ProblemDetail handleRuntimeExceptions(RuntimeException exception) {
+        exception.printStackTrace();
+        ProblemDetail problemDetail;
+        HttpStatusCode statusCode;
+        
+        if (exception instanceof FileUploadException) {
+            statusCode = HttpStatusCode.valueOf(HttpStatus.BAD_REQUEST.value());
+            problemDetail = ProblemDetail.forStatusAndDetail(statusCode, exception.getMessage());
+            problemDetail.setProperty("description", ErrorMessage.FILE_UPLOAD_FAILURE);
+        } else if (exception instanceof RoleNotFoundException) {
+            statusCode = HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value());
+            problemDetail = ProblemDetail.forStatusAndDetail(statusCode, exception.getMessage());
+            problemDetail.setProperty("description", ErrorMessage.ROLE_NOT_FOUND_MESSAGE);
+        } else if (exception instanceof UsernameNotFoundException) {
+            statusCode = HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value());
+            problemDetail = ProblemDetail.forStatusAndDetail(statusCode, exception.getMessage());
+            problemDetail.setProperty("description", ErrorMessage.USER_NOT_FOUND_MESSAGE);
+        } else {
+            statusCode = HttpStatusCode.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            problemDetail = ProblemDetail.forStatusAndDetail(statusCode, exception.getMessage());
+            problemDetail.setProperty("description", ErrorMessage.INTERNAL_SERVER_ERROR_MESSAGE);
+        }
+        return ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
+    }
+    
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleGlobalExceptions(Exception exception) {
         exception.printStackTrace();
