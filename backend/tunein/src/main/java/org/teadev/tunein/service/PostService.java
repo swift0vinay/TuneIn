@@ -7,6 +7,7 @@ import org.teadev.tunein.constants.ErrorMessage;
 import org.teadev.tunein.dto.request.PostEntityRequestDto;
 import org.teadev.tunein.entities.PostEntity;
 import org.teadev.tunein.entities.UserEntity;
+import org.teadev.tunein.exceptions.PostNotFoundException;
 import org.teadev.tunein.exceptions.UserNotFoundException;
 import org.teadev.tunein.repository.PostRepository;
 import org.teadev.tunein.repository.UserRepository;
@@ -54,6 +55,21 @@ public class PostService {
         postRepository.save(post);
         
         return post;
+    }
+    
+    public PostEntity getPosts(String postId) {
+        return postRepository.findById(Integer.parseInt(postId))
+                .orElseThrow(() -> new PostNotFoundException("No post found with the requested id"));
+    }
+    
+    public List<PostEntity> getPostsByUser(String userId) {
+        UserEntity user = userRepository
+                .findById(UUID.fromString(userId))
+                .orElseThrow(() -> new UserNotFoundException(ErrorMessage.USER_NOT_FOUND_MESSAGE));
+        
+        return postRepository
+                .findPostByUser(user)
+                .orElse(List.of());
     }
     
 }

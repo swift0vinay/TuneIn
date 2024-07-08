@@ -4,6 +4,8 @@ import org.springframework.stereotype.Service;
 import org.teadev.tunein.dto.response.PostEntityResponseDto;
 import org.teadev.tunein.entities.PostEntity;
 
+import java.util.List;
+
 @Service
 public class DtoConverter {
     
@@ -17,6 +19,15 @@ public class DtoConverter {
                 .body(post.getBody())
                 .files(post.getFiles())
                 .build();
+    }
+    
+    public List<PostEntityResponseDto> toDto(List<PostEntity> posts) {
+        if (posts == null) {
+            return null;
+        }
+        return posts.stream()
+                .map(this::toDto)
+                .toList();
     }
     
 }
