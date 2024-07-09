@@ -1,8 +1,10 @@
 package org.teadev.tunein.dto.converter;
 
 import org.springframework.stereotype.Service;
+import org.teadev.tunein.dto.response.LikeEntityResponseDto;
 import org.teadev.tunein.dto.response.PostEntityResponseDto;
 import org.teadev.tunein.dto.response.UserEntityResponseDto;
+import org.teadev.tunein.entities.LikeEntity;
 import org.teadev.tunein.entities.PostEntity;
 import org.teadev.tunein.entities.UserEntity;
 
@@ -47,6 +49,7 @@ public class DtoConverter {
                 .updatedAt(post.getUpdatedAt())
                 .body(post.getBody())
                 .files(post.getFiles())
+                .likeCount(post.getLikeCount())
                 .build();
     }
     
@@ -57,6 +60,18 @@ public class DtoConverter {
         return posts.stream()
                 .map(this::toDto)
                 .toList();
+    }
+    
+    public LikeEntityResponseDto toDto(LikeEntity likeEntity) {
+        if (likeEntity == null) {
+            return null;
+        }
+        return LikeEntityResponseDto.builder()
+                .id(likeEntity.getId())
+                .userId(likeEntity.getUser().getId().toString())
+                .postId(likeEntity.getPost().getId())
+                .commentId(likeEntity.getComment() == null ? null : likeEntity.getComment().getId())
+                .build();
     }
     
 }

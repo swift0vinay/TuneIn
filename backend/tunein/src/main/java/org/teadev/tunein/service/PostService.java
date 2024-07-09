@@ -1,37 +1,41 @@
 package org.teadev.tunein.service;
 
+import jakarta.transaction.Transactional;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.teadev.tunein.constants.ErrorMessage;
+import org.teadev.tunein.dto.request.LikeRequestDto;
 import org.teadev.tunein.dto.request.PostEntityRequestDto;
+import org.teadev.tunein.entities.LikeEntity;
 import org.teadev.tunein.entities.PostEntity;
 import org.teadev.tunein.entities.UserEntity;
 import org.teadev.tunein.exceptions.PostNotFoundException;
-import org.teadev.tunein.exceptions.UserNotFoundException;
+import org.teadev.tunein.repository.LikeRepository;
 import org.teadev.tunein.repository.PostRepository;
-import org.teadev.tunein.repository.UserRepository;
 
 import java.util.List;
-import java.util.UUID;
+import java.util.Optional;
 
 @Service
 @Log4j2
 public class PostService {
     
     @Autowired
-    UserRepository userRepository;
+    private PostRepository postRepository;
     
     @Autowired
-    PostRepository postRepository;
+    private LikeRepository likeRepository;
     
     @Autowired
-    StorageService storageService;
+    private UserService userService;
+    
+    
+    @Autowired
+    private StorageService storageService;
+    
     
     public PostEntity createPost(PostEntityRequestDto request) {
-        UserEntity user = userRepository
-                .findById(UUID.fromString(request.getUserId()))
-                .orElseThrow(() -> new UserNotFoundException(ErrorMessage.USER_NOT_FOUND_MESSAGE));
+        UserEntity user = userService.getUser(request.getUserId());
         
         List<String> filePaths = null;
         
@@ -57,19 +61,37 @@ public class PostService {
         return post;
     }
     
-    public PostEntity getPosts(String postId) {
+    @Transactional
+    public PostEntity getPost(String postId) {
         return postRepository.findById(Integer.parseInt(postId))
                 .orElseThrow(() -> new PostNotFoundException("No post found with the requested id"));
     }
     
     public List<PostEntity> getPostsByUser(String userId) {
-        UserEntity user = userRepository
-                .findById(UUID.fromString(userId))
-                .orElseThrow(() -> new UserNotFoundException(ErrorMessage.USER_NOT_FOUND_MESSAGE));
+        UserEntity user = userService.getUser(userId);
         
         return postRepository
                 .findPostByUser(user)
                 .orElse(List.of());
+    }
+    
+    @Transactional
+    public LikeEntity likePost(LikeRequestDto request) {
+        PostEntity postEntity = getPost(request.getPostId());
+        UserEntity userEntity = userService.getUser(request.getUserId());
+        
+        // check if post is already liked by the same user
+        Optional<LikeEntity> optionalLikeEntity = likeRepository.findByPostAndUser(postEntity, userEntity);
+        if (optionalLikeEntity.isPresent()) {
+            return optionalLikeEntity.get();
+        }
+        
+        LikeEntity likeEntity = LikeEntity
+                .builder()
+                .post(postEntity)
+                .user(userEntity)
+                .build();
+        return likeRepository.save(likeEntity);
     }
     
 }

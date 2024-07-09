@@ -21,4 +21,6 @@ public class PostEntityResponseDto {
     
     private String files;
     
+    private Long likeCount;
+    
 }

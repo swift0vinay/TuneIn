@@ -7,8 +7,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.teadev.tunein.dto.converter.DtoConverter;
+import org.teadev.tunein.dto.request.LikeRequestDto;
 import org.teadev.tunein.dto.request.PostEntityRequestDto;
+import org.teadev.tunein.dto.response.LikeEntityResponseDto;
 import org.teadev.tunein.dto.response.PostEntityResponseDto;
+import org.teadev.tunein.entities.LikeEntity;
 import org.teadev.tunein.entities.PostEntity;
 import org.teadev.tunein.service.PostService;
 
@@ -36,7 +39,7 @@ public class PostController {
     @GetMapping("/{post_id}")
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
     public ResponseEntity<PostEntityResponseDto> getPostByPostId(@PathVariable("post_id") String postId) {
-        PostEntity posts = postService.getPosts(postId);
+        PostEntity posts = postService.getPost(postId);
         return ResponseEntity.ok(dtoConverter.toDto(posts));
     }
     
@@ -47,4 +50,11 @@ public class PostController {
         return ResponseEntity.ok(dtoConverter.toPostEntityListDto(posts));
     }
     
+    @PostMapping(path = "/like")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
+    public ResponseEntity<LikeEntityResponseDto> likePost(@RequestBody LikeRequestDto requestDto) {
+        LikeEntity likeEntity = postService.likePost(requestDto);
+        return ResponseEntity.ok(dtoConverter.toDto(likeEntity));
+    }
+ 
 }

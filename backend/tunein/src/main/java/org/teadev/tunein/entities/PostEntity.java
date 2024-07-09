@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
@@ -45,5 +46,8 @@ public class PostEntity {
     @JoinTable(joinColumns = @JoinColumn(name = "post_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "comment_id"))
     private List<CommentEntity> comments;
+    
+    @Formula(value = "(SELECT COUNT(*) from likes where likes.post_id=id)")
+    private Long likeCount = 0L;
     
 }

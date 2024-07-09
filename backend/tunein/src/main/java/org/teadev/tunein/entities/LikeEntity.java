@@ -2,8 +2,10 @@ package org.teadev.tunein.entities;
 
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import org.apache.catalina.User;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.util.Date;
@@ -11,6 +13,9 @@ import java.util.Date;
 @Table(name = "likes")
 @Entity
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class LikeEntity {
     
     @Id
@@ -19,15 +24,15 @@ public class LikeEntity {
     
     @ManyToOne
     @JoinColumn(name = "post_id")
-    PostEntity postId;
+    PostEntity post;
     
     @ManyToOne
     @JoinColumn(name = "comment_id")
-    CommentEntity commentId;
+    CommentEntity comment;
     
     @ManyToOne
     @JoinColumn(name = "user_id")
-    UserEntity userId;
+    UserEntity user;
     
     @CreationTimestamp
     private Date createdAt;
