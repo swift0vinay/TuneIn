@@ -38,8 +38,12 @@ public class UserService {
     
     public List<UserEntity> findAllAdmins() {
         Role role = roleService.validateAndFetchRole(RoleType.ADMIN);
-        List<UserEntity> users = userRepository.findAllByRole(role);
-        return users;
+        return userRepository.findAllByRole(role);
+    }
+    
+    public List<UserEntity> findAllUsers() {
+        Role role = roleService.validateAndFetchRole(RoleType.USER);
+        return userRepository.findAllByRole(role);
     }
     
 }

@@ -10,6 +10,8 @@ public class ErrorMessage {
     
     public static final String ROLE_NOT_FOUND_MESSAGE = "Cannot find required role";
     
-    public static final String FILE_UPLOAD_FAILURE = "Failure while uploading file";
+    public static final String FILE_UPLOAD_FAILURE_MESSAGE = "Failure while uploading file";
+    
+    public static final String ACCESS_DENIED_MESSAGE = "Resource is not accessible";
     
 }
