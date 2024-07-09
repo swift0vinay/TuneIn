@@ -20,7 +20,7 @@ public class UserService {
     private UserRepository userRepository;
     
     @Autowired
-    RoleService roleService;
+    private RoleService roleService;
     
     @Autowired
     private PasswordEncoder passwordEncoder;
