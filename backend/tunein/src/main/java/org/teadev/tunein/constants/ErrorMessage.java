@@ -14,4 +14,10 @@ public class ErrorMessage {
     
     public static final String ACCESS_DENIED_MESSAGE = "Resource is not accessible";
     
+    public static final String USER_ALREADY_PRESENT_MESSAGE = "User is already present";
+    
+    public static final String POST_NOT_FOUND_MESSAGE = "Post not found";
+    
+    public static final String LIKE_NOT_FOUND_MESSAGE = "Like not found";
+    
 }

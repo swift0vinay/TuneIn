@@ -7,11 +7,13 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.teadev.tunein.constants.ErrorMessage;
 import org.teadev.tunein.dto.request.UserLoginRequestDto;
 import org.teadev.tunein.dto.request.UserRegisterRequestDto;
 import org.teadev.tunein.entities.Role;
 import org.teadev.tunein.entities.UserEntity;
 import org.teadev.tunein.entities.enums.RoleType;
+import org.teadev.tunein.exceptions.UserAlreadyPresentException;
 import org.teadev.tunein.repository.UserRepository;
 
 @Service
@@ -31,6 +33,9 @@ public class AuthenticationService {
     private RoleService roleService;
     
     public UserEntity register(UserRegisterRequestDto dto) {
+        if (userRepository.findByHandleOrEmail(dto.getUsername(), dto.getUsername()).isPresent()) {
+            throw new UserAlreadyPresentException(ErrorMessage.USER_ALREADY_PRESENT_MESSAGE);
+        }
         Role role = roleService.validateAndFetchRole(RoleType.USER);
         UserEntity userEntity = UserEntity.builder()
                 .email(dto.getUsername())

@@ -61,7 +61,6 @@ public class GlobalExceptionHandler {
         exception.printStackTrace();
         ProblemDetail problemDetail;
         HttpStatusCode statusCode;
-        
         if (exception instanceof FileUploadException) {
             statusCode = HttpStatusCode.valueOf(HttpStatus.BAD_REQUEST.value());
             problemDetail = ProblemDetail.forStatusAndDetail(statusCode, exception.getMessage());
@@ -74,12 +73,24 @@ public class GlobalExceptionHandler {
             statusCode = HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value());
             problemDetail = ProblemDetail.forStatusAndDetail(statusCode, exception.getMessage());
             problemDetail.setProperty("description", ErrorMessage.USER_NOT_FOUND_MESSAGE);
+        } else if (exception instanceof UserAlreadyPresentException) {
+            statusCode = HttpStatusCode.valueOf(HttpStatus.BAD_REQUEST.value());
+            problemDetail = ProblemDetail.forStatusAndDetail(statusCode, exception.getMessage());
+            problemDetail.setProperty("description", ErrorMessage.USER_ALREADY_PRESENT_MESSAGE);
+        } else if (exception instanceof PostNotFoundException) {
+            statusCode = HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value());
+            problemDetail = ProblemDetail.forStatusAndDetail(statusCode, exception.getMessage());
+            problemDetail.setProperty("description", ErrorMessage.POST_NOT_FOUND_MESSAGE);
+        } else if (exception instanceof LikeNotFoundException) {
+            statusCode = HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value());
+            problemDetail = ProblemDetail.forStatusAndDetail(statusCode, exception.getMessage());
+            problemDetail.setProperty("description", ErrorMessage.LIKE_NOT_FOUND_MESSAGE);
         } else {
             statusCode = HttpStatusCode.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value());
             problemDetail = ProblemDetail.forStatusAndDetail(statusCode, exception.getMessage());
             problemDetail.setProperty("description", ErrorMessage.INTERNAL_SERVER_ERROR_MESSAGE);
         }
-        return ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage());
+        return problemDetail;
     }
     
     @ExceptionHandler(Exception.class)

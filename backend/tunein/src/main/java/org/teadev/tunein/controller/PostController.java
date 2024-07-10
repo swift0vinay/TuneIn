@@ -2,6 +2,7 @@ package org.teadev.tunein.controller;
 
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.teadev.tunein.dto.converter.DtoConverter;
 import org.teadev.tunein.dto.request.LikeRequestDto;
 import org.teadev.tunein.dto.request.PostEntityRequestDto;
+import org.teadev.tunein.dto.request.UnlikeRequestDto;
 import org.teadev.tunein.dto.response.LikeEntityResponseDto;
 import org.teadev.tunein.dto.response.PostEntityResponseDto;
 import org.teadev.tunein.entities.LikeEntity;
@@ -56,5 +58,12 @@ public class PostController {
         LikeEntity likeEntity = postService.likePost(requestDto);
         return ResponseEntity.ok(dtoConverter.toDto(likeEntity));
     }
- 
+    
+    @PostMapping(path = "/unlike")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
+    public ResponseEntity unlikePost(@RequestBody UnlikeRequestDto requestDto) {
+        postService.unlikePost(requestDto);
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
+    
 }

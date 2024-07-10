@@ -4,11 +4,14 @@ import jakarta.transaction.Transactional;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.teadev.tunein.constants.ErrorMessage;
 import org.teadev.tunein.dto.request.LikeRequestDto;
 import org.teadev.tunein.dto.request.PostEntityRequestDto;
+import org.teadev.tunein.dto.request.UnlikeRequestDto;
 import org.teadev.tunein.entities.LikeEntity;
 import org.teadev.tunein.entities.PostEntity;
 import org.teadev.tunein.entities.UserEntity;
+import org.teadev.tunein.exceptions.LikeNotFoundException;
 import org.teadev.tunein.exceptions.PostNotFoundException;
 import org.teadev.tunein.repository.LikeRepository;
 import org.teadev.tunein.repository.PostRepository;
@@ -64,7 +67,7 @@ public class PostService {
     @Transactional
     public PostEntity getPost(String postId) {
         return postRepository.findById(Integer.parseInt(postId))
-                .orElseThrow(() -> new PostNotFoundException("No post found with the requested id"));
+                .orElseThrow(() -> new PostNotFoundException(ErrorMessage.POST_NOT_FOUND_MESSAGE));
     }
     
     public List<PostEntity> getPostsByUser(String userId) {
@@ -92,6 +95,16 @@ public class PostService {
                 .user(userEntity)
                 .build();
         return likeRepository.save(likeEntity);
+    }
+    
+    @Transactional
+    public void unlikePost(UnlikeRequestDto request) {
+        PostEntity postEntity = getPost(request.getPostId());
+        UserEntity userEntity = userService.getUser(request.getUserId());
+        
+        LikeEntity likeEntity = likeRepository.findByPostAndUser(postEntity, userEntity)
+                .orElseThrow(() -> new LikeNotFoundException(ErrorMessage.LIKE_NOT_FOUND_MESSAGE));
+        likeRepository.delete(likeEntity);
     }
     
 }
