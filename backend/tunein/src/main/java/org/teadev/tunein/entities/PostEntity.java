@@ -22,7 +22,7 @@ public class PostEntity {
     
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Integer id;
+    private Long id;
     
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -42,12 +42,18 @@ public class PostEntity {
     @Column
     private String files;
     
-    @OneToMany(cascade = CascadeType.REMOVE)
-    @JoinTable(joinColumns = @JoinColumn(name = "post_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "comment_id"))
+    @OneToMany(orphanRemoval = true, mappedBy = "post")
     private List<CommentEntity> comments;
     
-    @Formula(value = "(SELECT COUNT(*) from likes where likes.post_id=id)")
+    @OneToMany(orphanRemoval = true, mappedBy = "post")
+    private List<LikeEntity> likes;
+    
+    @Formula(value = "(SELECT COUNT(*) from likes where likes.post_id=id and likes.comment_id is NULL)")
     private Long likeCount = 0L;
+    
+    @Transient
+    public Long getLikeCount() {
+        return likeCount;
+    }
     
 }

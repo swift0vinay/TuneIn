@@ -3,23 +3,17 @@ package org.teadev.tunein.dto.response;
 import lombok.Builder;
 import lombok.Data;
 
-import java.util.Date;
-
-@Data
 @Builder
-public class PostEntityResponseDto {
+@Data
+public class CommentEntityResponseDto {
     
     private Long id;
     
-    private String userId;
-    
-    private Date createdAt;
-    
-    private Date updatedAt;
-    
     private String body;
     
-    private String files;
+    private Long postId;
+    
+    private String userId;
     
     private Long likeCount;
     

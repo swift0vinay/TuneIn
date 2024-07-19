@@ -85,6 +85,10 @@ public class GlobalExceptionHandler {
             statusCode = HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value());
             problemDetail = ProblemDetail.forStatusAndDetail(statusCode, exception.getMessage());
             problemDetail.setProperty("description", ErrorMessage.LIKE_NOT_FOUND_MESSAGE);
+        } else if (exception instanceof CommentNotFoundException) {
+            statusCode = HttpStatusCode.valueOf(HttpStatus.NOT_FOUND.value());
+            problemDetail = ProblemDetail.forStatusAndDetail(statusCode, exception.getMessage());
+            problemDetail.setProperty("description", ErrorMessage.COMMENT_NOT_FOUND_MESSAGE);
         } else {
             statusCode = HttpStatusCode.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value());
             problemDetail = ProblemDetail.forStatusAndDetail(statusCode, exception.getMessage());

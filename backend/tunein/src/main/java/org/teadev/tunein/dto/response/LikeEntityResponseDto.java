@@ -7,12 +7,12 @@ import lombok.Data;
 @Builder
 public class LikeEntityResponseDto {
     
-    private Integer id;
+    private Long id;
     
-    private Integer postId;
+    private Long postId;
     
     private String userId;
     
-    private Integer commentId;
+    private Long commentId;
     
 }

@@ -5,9 +5,11 @@ import lombok.Data;
 
 @Data
 @Builder
-public class LikeRequestDto {
+public class LikeEntityRequestDto {
     
-    private String postId;
+    private Long postId;
+    
+    private Long commentId;
     
     private String userId;
     

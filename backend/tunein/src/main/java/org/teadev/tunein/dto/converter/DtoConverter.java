@@ -1,9 +1,11 @@
 package org.teadev.tunein.dto.converter;
 
 import org.springframework.stereotype.Service;
+import org.teadev.tunein.dto.response.CommentEntityResponseDto;
 import org.teadev.tunein.dto.response.LikeEntityResponseDto;
 import org.teadev.tunein.dto.response.PostEntityResponseDto;
 import org.teadev.tunein.dto.response.UserEntityResponseDto;
+import org.teadev.tunein.entities.CommentEntity;
 import org.teadev.tunein.entities.LikeEntity;
 import org.teadev.tunein.entities.PostEntity;
 import org.teadev.tunein.entities.UserEntity;
@@ -43,7 +45,7 @@ public class DtoConverter {
         }
         return PostEntityResponseDto
                 .builder()
-                .id(post.getId().toString())
+                .id(post.getId())
                 .userId(post.getUser().getId().toString())
                 .createdAt(post.getCreatedAt())
                 .updatedAt(post.getUpdatedAt())
@@ -72,6 +74,28 @@ public class DtoConverter {
                 .postId(likeEntity.getPost().getId())
                 .commentId(likeEntity.getComment() == null ? null : likeEntity.getComment().getId())
                 .build();
+    }
+    
+    public CommentEntityResponseDto toDto(CommentEntity commentEntity) {
+        if (commentEntity == null) {
+            return null;
+        }
+        return CommentEntityResponseDto.builder()
+                .id(commentEntity.getId())
+                .postId(commentEntity.getPost().getId())
+                .userId(commentEntity.getUser().getId().toString())
+                .body(commentEntity.getBody())
+                .likeCount(commentEntity.getLikeCount())
+                .build();
+    }
+    
+    public List<CommentEntityResponseDto> toCommentEntityListDto(List<CommentEntity> comments) {
+        if (comments == null) {
+            return null;
+        }
+        return comments.stream()
+                .map(this::toDto)
+                .toList();
     }
     
 }

@@ -20,4 +20,6 @@ public class ErrorMessage {
     
     public static final String LIKE_NOT_FOUND_MESSAGE = "Like not found";
     
+    public static final String COMMENT_NOT_FOUND_MESSAGE = "Comment not found";
+    
 }

@@ -5,19 +5,18 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.teadev.tunein.constants.ErrorMessage;
-import org.teadev.tunein.dto.request.LikeRequestDto;
+import org.teadev.tunein.dto.request.CommentEntityRequestDto;
+import org.teadev.tunein.dto.request.LikeEntityRequestDto;
 import org.teadev.tunein.dto.request.PostEntityRequestDto;
 import org.teadev.tunein.dto.request.UnlikeRequestDto;
+import org.teadev.tunein.entities.CommentEntity;
 import org.teadev.tunein.entities.LikeEntity;
 import org.teadev.tunein.entities.PostEntity;
 import org.teadev.tunein.entities.UserEntity;
-import org.teadev.tunein.exceptions.LikeNotFoundException;
 import org.teadev.tunein.exceptions.PostNotFoundException;
-import org.teadev.tunein.repository.LikeRepository;
 import org.teadev.tunein.repository.PostRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Log4j2
@@ -27,15 +26,16 @@ public class PostService {
     private PostRepository postRepository;
     
     @Autowired
-    private LikeRepository likeRepository;
+    private LikeService likeService;
     
     @Autowired
     private UserService userService;
     
-    
     @Autowired
     private StorageService storageService;
     
+    @Autowired
+    private CommentService commentService;
     
     public PostEntity createPost(PostEntityRequestDto request) {
         UserEntity user = userService.getUser(request.getUserId());
@@ -65,8 +65,8 @@ public class PostService {
     }
     
     @Transactional
-    public PostEntity getPost(String postId) {
-        return postRepository.findById(Integer.parseInt(postId))
+    public PostEntity getPost(Long postId) {
+        return postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException(ErrorMessage.POST_NOT_FOUND_MESSAGE));
     }
     
@@ -78,33 +78,51 @@ public class PostService {
                 .orElse(List.of());
     }
     
-    @Transactional
-    public LikeEntity likePost(LikeRequestDto request) {
-        PostEntity postEntity = getPost(request.getPostId());
-        UserEntity userEntity = userService.getUser(request.getUserId());
-        
-        // check if post is already liked by the same user
-        Optional<LikeEntity> optionalLikeEntity = likeRepository.findByPostAndUser(postEntity, userEntity);
-        if (optionalLikeEntity.isPresent()) {
-            return optionalLikeEntity.get();
-        }
-        
-        LikeEntity likeEntity = LikeEntity
-                .builder()
-                .post(postEntity)
-                .user(userEntity)
-                .build();
-        return likeRepository.save(likeEntity);
+    public void deletePost(Long postId) {
+        PostEntity postEntity = getPost(postId);
+        postRepository.delete(postEntity);
     }
     
-    @Transactional
-    public void unlikePost(UnlikeRequestDto request) {
-        PostEntity postEntity = getPost(request.getPostId());
-        UserEntity userEntity = userService.getUser(request.getUserId());
-        
-        LikeEntity likeEntity = likeRepository.findByPostAndUser(postEntity, userEntity)
-                .orElseThrow(() -> new LikeNotFoundException(ErrorMessage.LIKE_NOT_FOUND_MESSAGE));
-        likeRepository.delete(likeEntity);
+    public LikeEntity likePost(LikeEntityRequestDto requestDto) {
+        PostEntity post = getPost(requestDto.getPostId());
+        UserEntity user = userService.getUser(requestDto.getUserId());
+        return likeService.likePost(post, user, requestDto);
+    }
+    
+    public void unlikePost(UnlikeRequestDto requestDto) {
+        PostEntity post = getPost(requestDto.getPostId());
+        UserEntity user = userService.getUser(requestDto.getUserId());
+        likeService.unlikePost(post, user, requestDto);
+    }
+    
+    public List<CommentEntity> findCommentsByPostId(Long postId) {
+        PostEntity postEntity = getPost(postId);
+        return commentService.findCommentsByPost(postEntity);
+    }
+    
+    public CommentEntity addComment(CommentEntityRequestDto requestDto) {
+        PostEntity post = getPost(requestDto.getPostId());
+        UserEntity user = userService.getUser(requestDto.getUserId());
+        return commentService.addComment(post, user, requestDto);
+    }
+    
+    public void deleteComment(Long commentId) {
+        commentService.deleteComment(commentId);
+    }
+    
+    
+    public LikeEntity likeComment(LikeEntityRequestDto requestDto) {
+        PostEntity post = getPost(requestDto.getPostId());
+        UserEntity user = userService.getUser(requestDto.getUserId());
+        CommentEntity comment = commentService.getComment(requestDto.getCommentId());
+        return likeService.likeComment(post, user, comment, requestDto);
+    }
+    
+    public void unlikeComment(UnlikeRequestDto requestDto) {
+        PostEntity post = getPost(requestDto.getPostId());
+        UserEntity user = userService.getUser(requestDto.getUserId());
+        CommentEntity comment = commentService.getComment(requestDto.getCommentId());
+        likeService.unlikeComment(post, user, comment, requestDto);
     }
     
 }

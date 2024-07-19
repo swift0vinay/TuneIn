@@ -3,14 +3,14 @@ package org.teadev.tunein.dto.request;
 import lombok.Builder;
 import lombok.Data;
 
-@Data
 @Builder
-public class UnlikeRequestDto {
+@Data
+public class CommentEntityRequestDto {
     
     private Long postId;
     
-    private Long commentId;
-    
     private String userId;
+    
+    private String body;
     
 }

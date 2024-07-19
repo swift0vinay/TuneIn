@@ -8,11 +8,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.teadev.tunein.dto.converter.DtoConverter;
-import org.teadev.tunein.dto.request.LikeRequestDto;
+import org.teadev.tunein.dto.request.CommentEntityRequestDto;
+import org.teadev.tunein.dto.request.LikeEntityRequestDto;
 import org.teadev.tunein.dto.request.PostEntityRequestDto;
 import org.teadev.tunein.dto.request.UnlikeRequestDto;
+import org.teadev.tunein.dto.response.CommentEntityResponseDto;
 import org.teadev.tunein.dto.response.LikeEntityResponseDto;
 import org.teadev.tunein.dto.response.PostEntityResponseDto;
+import org.teadev.tunein.entities.CommentEntity;
 import org.teadev.tunein.entities.LikeEntity;
 import org.teadev.tunein.entities.PostEntity;
 import org.teadev.tunein.service.PostService;
@@ -25,10 +28,10 @@ import java.util.List;
 public class PostController {
     
     @Autowired
-    PostService postService;
+    private PostService postService;
     
     @Autowired
-    DtoConverter dtoConverter;
+    private DtoConverter dtoConverter;
     
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
@@ -38,9 +41,17 @@ public class PostController {
     }
     
     
+    @DeleteMapping("/{post_id}")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
+    public ResponseEntity removePost(@PathVariable("post_id") Long postId) {
+        postService.deletePost(postId);
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
+    
+    
     @GetMapping("/{post_id}")
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
-    public ResponseEntity<PostEntityResponseDto> getPostByPostId(@PathVariable("post_id") String postId) {
+    public ResponseEntity<PostEntityResponseDto> getPostByPostId(@PathVariable("post_id") Long postId) {
         PostEntity posts = postService.getPost(postId);
         return ResponseEntity.ok(dtoConverter.toDto(posts));
     }
@@ -54,7 +65,7 @@ public class PostController {
     
     @PostMapping(path = "/like")
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
-    public ResponseEntity<LikeEntityResponseDto> likePost(@RequestBody LikeRequestDto requestDto) {
+    public ResponseEntity<LikeEntityResponseDto> likePost(@RequestBody LikeEntityRequestDto requestDto) {
         LikeEntity likeEntity = postService.likePost(requestDto);
         return ResponseEntity.ok(dtoConverter.toDto(likeEntity));
     }
@@ -65,5 +76,51 @@ public class PostController {
         postService.unlikePost(requestDto);
         return ResponseEntity.ok(HttpStatus.OK);
     }
+    
+    
+    @GetMapping(path = "/{post_id}/comments")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
+    public ResponseEntity<List<CommentEntityResponseDto>> findAllCommentsOnPost(@PathVariable("post_id") Long postId) {
+        List<CommentEntity> comments = postService.findCommentsByPostId(postId);
+        return ResponseEntity.ok(dtoConverter.toCommentEntityListDto(comments));
+    }
+    
+    @PostMapping(path = "/comment")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
+    public ResponseEntity<CommentEntityResponseDto> addComment(@RequestBody CommentEntityRequestDto requestDto) {
+        CommentEntity commentEntity = postService.addComment(requestDto);
+        return ResponseEntity.ok(dtoConverter.toDto(commentEntity));
+    }
+    
+    @PostMapping(path = "/comment/{comment_id}")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
+    public ResponseEntity updateComment(@PathVariable("comment_id") Long commentId, @RequestBody CommentEntityRequestDto requestDto) {
+//        CommentEntity commentEntity = postService.u(requestDto);
+//        return ResponseEntity.ok(dtoConverter.toDto(commentEntity));
+        //TODO: Add logic
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
+    
+    @DeleteMapping(path = "/comment/{comment_id}")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
+    public ResponseEntity deleteComment(@PathVariable("comment_id") Long commentId) {
+        postService.deleteComment(commentId);
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
+    
+    @PostMapping(path = "/comment/like")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
+    public ResponseEntity<LikeEntityResponseDto> likeComment(@RequestBody LikeEntityRequestDto requestDto) {
+        LikeEntity likeEntity = postService.likeComment(requestDto);
+        return ResponseEntity.ok(dtoConverter.toDto(likeEntity));
+    }
+    
+    @PostMapping(path = "/comment/unlike")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
+    public ResponseEntity unlikeComment(@RequestBody UnlikeRequestDto requestDto) {
+        postService.unlikeComment(requestDto);
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
+    
     
 }

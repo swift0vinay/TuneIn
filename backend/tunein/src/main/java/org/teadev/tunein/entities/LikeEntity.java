@@ -20,7 +20,7 @@ public class LikeEntity {
     
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    Integer id;
+    Long id;
     
     @ManyToOne
     @JoinColumn(name = "post_id")
