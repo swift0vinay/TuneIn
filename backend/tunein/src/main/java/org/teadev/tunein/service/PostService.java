@@ -13,7 +13,7 @@ import org.teadev.tunein.entities.CommentEntity;
 import org.teadev.tunein.entities.LikeEntity;
 import org.teadev.tunein.entities.PostEntity;
 import org.teadev.tunein.entities.UserEntity;
-import org.teadev.tunein.exceptions.PostNotFoundException;
+import org.teadev.tunein.exceptions.ResourceNotFoundException;
 import org.teadev.tunein.repository.PostRepository;
 
 import java.util.List;
@@ -67,7 +67,7 @@ public class PostService {
     @Transactional
     public PostEntity getPost(Long postId) {
         return postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFoundException(ErrorMessage.POST_NOT_FOUND_MESSAGE));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.POST_NOT_FOUND_MESSAGE));
     }
     
     public List<PostEntity> getPostsByUser(String userId) {

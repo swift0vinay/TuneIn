@@ -10,7 +10,7 @@ import org.teadev.tunein.entities.CommentEntity;
 import org.teadev.tunein.entities.LikeEntity;
 import org.teadev.tunein.entities.PostEntity;
 import org.teadev.tunein.entities.UserEntity;
-import org.teadev.tunein.exceptions.LikeNotFoundException;
+import org.teadev.tunein.exceptions.ResourceNotFoundException;
 import org.teadev.tunein.repository.LikeRepository;
 
 import java.util.Optional;
@@ -40,7 +40,7 @@ public class LikeService {
     @Transactional
     public void unlikePost(PostEntity post, UserEntity user, UnlikeRequestDto request) {
         LikeEntity likeEntity = likeRepository.findByPostAndUser(post, user)
-                .orElseThrow(() -> new LikeNotFoundException(ErrorMessage.LIKE_NOT_FOUND_MESSAGE));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.LIKE_NOT_FOUND_MESSAGE));
         likeRepository.delete(likeEntity);
     }
     
@@ -64,7 +64,7 @@ public class LikeService {
     @Transactional
     public void unlikeComment(PostEntity post, UserEntity user, CommentEntity comment, UnlikeRequestDto request) {
         LikeEntity likeEntity = likeRepository.findByPostAndUserAndComment(post, user, comment)
-                .orElseThrow(() -> new LikeNotFoundException(ErrorMessage.LIKE_NOT_FOUND_MESSAGE));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.LIKE_NOT_FOUND_MESSAGE));
         likeRepository.delete(likeEntity);
     }
     

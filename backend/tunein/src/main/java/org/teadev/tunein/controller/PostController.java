@@ -6,19 +6,26 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
+import org.teadev.tunein.constants.ErrorMessage;
 import org.teadev.tunein.dto.converter.DtoConverter;
 import org.teadev.tunein.dto.request.CommentEntityRequestDto;
 import org.teadev.tunein.dto.request.LikeEntityRequestDto;
 import org.teadev.tunein.dto.request.PostEntityRequestDto;
 import org.teadev.tunein.dto.request.UnlikeRequestDto;
 import org.teadev.tunein.dto.response.CommentEntityResponseDto;
+import org.teadev.tunein.dto.response.ErrorResponse;
 import org.teadev.tunein.dto.response.LikeEntityResponseDto;
 import org.teadev.tunein.dto.response.PostEntityResponseDto;
 import org.teadev.tunein.entities.CommentEntity;
 import org.teadev.tunein.entities.LikeEntity;
 import org.teadev.tunein.entities.PostEntity;
 import org.teadev.tunein.service.PostService;
+import org.teadev.tunein.validators.MultipartFileExtensionValidator;
 
 import java.util.List;
 
@@ -33,9 +40,24 @@ public class PostController {
     @Autowired
     private DtoConverter dtoConverter;
     
+    @Autowired
+    private MultipartFileExtensionValidator fileExtensionValidator;
+    
+    @InitBinder
+    protected void initBinder(WebDataBinder binder) {
+        binder.addValidators(fileExtensionValidator);
+    }
+    
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
-    public ResponseEntity<PostEntityResponseDto> createPost(@ModelAttribute PostEntityRequestDto request) {
+    public ResponseEntity<?> createPost(@ModelAttribute @Validated PostEntityRequestDto request, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            List<ObjectError> errors = bindingResult.getAllErrors();
+            ErrorResponse errorResponse = new ErrorResponse();
+            errorResponse.setTitle(ErrorMessage.INVALID_INPUTS_MESSAGE);
+            errorResponse.setErrors(errors.stream().map(ObjectError::getDefaultMessage).toList());
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
         PostEntity post = postService.createPost(request);
         return ResponseEntity.ok(dtoConverter.toDto(post));
     }
@@ -90,15 +112,6 @@ public class PostController {
     public ResponseEntity<CommentEntityResponseDto> addComment(@RequestBody CommentEntityRequestDto requestDto) {
         CommentEntity commentEntity = postService.addComment(requestDto);
         return ResponseEntity.ok(dtoConverter.toDto(commentEntity));
-    }
-    
-    @PostMapping(path = "/comment/{comment_id}")
-    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
-    public ResponseEntity updateComment(@PathVariable("comment_id") Long commentId, @RequestBody CommentEntityRequestDto requestDto) {
-//        CommentEntity commentEntity = postService.u(requestDto);
-//        return ResponseEntity.ok(dtoConverter.toDto(commentEntity));
-        //TODO: Add logic
-        return ResponseEntity.ok(HttpStatus.OK);
     }
     
     @DeleteMapping(path = "/comment/{comment_id}")

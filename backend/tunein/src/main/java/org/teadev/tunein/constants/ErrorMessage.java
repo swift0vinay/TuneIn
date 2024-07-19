@@ -22,4 +22,6 @@ public class ErrorMessage {
     
     public static final String COMMENT_NOT_FOUND_MESSAGE = "Comment not found";
     
+    public static final String INVALID_INPUTS_MESSAGE = "Invalid inputs provided";
+    
 }

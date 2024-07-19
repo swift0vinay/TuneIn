@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import org.teadev.tunein.constants.ErrorMessage;
 import org.teadev.tunein.entities.Role;
 import org.teadev.tunein.entities.enums.RoleType;
-import org.teadev.tunein.exceptions.RoleNotFoundException;
+import org.teadev.tunein.exceptions.ResourceNotFoundException;
 import org.teadev.tunein.repository.RoleRepository;
 
 import java.util.Optional;
@@ -22,7 +22,7 @@ public class RoleService {
         Optional<Role> role = roleRepository.findByRoleType(roleType);
         if (role.isEmpty()) {
             log.warn(ErrorMessage.ROLE_NOT_FOUND_MESSAGE);
-            throw new RoleNotFoundException(ErrorMessage.ROLE_NOT_FOUND_MESSAGE);
+            throw new ResourceNotFoundException(ErrorMessage.ROLE_NOT_FOUND_MESSAGE);
         }
         return role.get();
     }

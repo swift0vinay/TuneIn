@@ -14,7 +14,7 @@ import org.teadev.tunein.dto.request.UserRegisterRequestDto;
 import org.teadev.tunein.entities.Role;
 import org.teadev.tunein.entities.UserEntity;
 import org.teadev.tunein.entities.enums.RoleType;
-import org.teadev.tunein.exceptions.RoleNotFoundException;
+import org.teadev.tunein.exceptions.ResourceNotFoundException;
 import org.teadev.tunein.repository.RoleRepository;
 import org.teadev.tunein.repository.UserRepository;
 
@@ -62,7 +62,7 @@ public class AdminSeeder implements ApplicationListener<ContextRefreshedEvent>, 
         Optional<Role> role = roleRepository.findByRoleType(RoleType.SUPER_ADMIN);
         if (role.isEmpty()) {
             log.warn(ErrorMessage.ROLE_NOT_FOUND_MESSAGE);
-            throw new RoleNotFoundException(ErrorMessage.ROLE_NOT_FOUND_MESSAGE);
+            throw new ResourceNotFoundException(ErrorMessage.ROLE_NOT_FOUND_MESSAGE);
         }
         
         log.info("Creating super admin");

@@ -10,7 +10,7 @@ import org.teadev.tunein.dto.request.UserRegisterRequestDto;
 import org.teadev.tunein.entities.Role;
 import org.teadev.tunein.entities.UserEntity;
 import org.teadev.tunein.entities.enums.RoleType;
-import org.teadev.tunein.exceptions.UserNotFoundException;
+import org.teadev.tunein.exceptions.ResourceNotFoundException;
 import org.teadev.tunein.repository.UserRepository;
 
 import java.util.List;
@@ -33,7 +33,7 @@ public class UserService {
     public UserEntity getUser(String id) {
         return userRepository
                 .findById(UUID.fromString(id))
-                .orElseThrow(() -> new UserNotFoundException(ErrorMessage.USER_NOT_FOUND_MESSAGE));
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.USER_NOT_FOUND_MESSAGE));
     }
     
     public UserEntity createAdmin(UserRegisterRequestDto dto) {
