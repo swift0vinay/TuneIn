@@ -1,6 +1,8 @@
 package org.teadev.tunein.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.teadev.tunein.constants.ErrorMessage;
 import org.teadev.tunein.dto.request.CommentEntityRequestDto;
@@ -38,8 +40,10 @@ public class CommentService {
         commentRepository.delete(commentEntity);
     }
     
-    public List<CommentEntity> findCommentsByPost(PostEntity postEntity) {
-        return commentRepository.findCommentsByPost(postEntity);
+    public List<CommentEntity> findCommentsByPost(PostEntity postEntity, Integer pageNo, Integer pageSize) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        return commentRepository.findCommentsByPost(postEntity, pageable)
+                .orElse(List.of());
     }
     
     

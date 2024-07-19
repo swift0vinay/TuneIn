@@ -1,20 +1,16 @@
 package org.teadev.tunein.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Builder;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
-@Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class LikeEntityResponseDto {
+public class PaginatedResponseDto {
     
-    private Long id;
+    Integer count;
     
-    private Long postId;
-    
-    private String userId;
-    
-    private Long commentId;
+    List<?> results;
     
 }

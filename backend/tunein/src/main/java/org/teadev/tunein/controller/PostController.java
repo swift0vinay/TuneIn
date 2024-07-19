@@ -8,8 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.teadev.tunein.constants.ErrorMessage;
 import org.teadev.tunein.dto.converter.DtoConverter;
@@ -17,15 +15,11 @@ import org.teadev.tunein.dto.request.CommentEntityRequestDto;
 import org.teadev.tunein.dto.request.LikeEntityRequestDto;
 import org.teadev.tunein.dto.request.PostEntityRequestDto;
 import org.teadev.tunein.dto.request.UnlikeRequestDto;
-import org.teadev.tunein.dto.response.CommentEntityResponseDto;
-import org.teadev.tunein.dto.response.ErrorResponse;
-import org.teadev.tunein.dto.response.LikeEntityResponseDto;
-import org.teadev.tunein.dto.response.PostEntityResponseDto;
+import org.teadev.tunein.dto.response.*;
 import org.teadev.tunein.entities.CommentEntity;
 import org.teadev.tunein.entities.LikeEntity;
 import org.teadev.tunein.entities.PostEntity;
 import org.teadev.tunein.service.PostService;
-import org.teadev.tunein.validators.MultipartFileExtensionValidator;
 
 import java.util.List;
 
@@ -39,18 +33,16 @@ public class PostController {
     
     @Autowired
     private DtoConverter dtoConverter;
-    
-    @Autowired
-    private MultipartFileExtensionValidator fileExtensionValidator;
-    
-    @InitBinder
-    protected void initBinder(WebDataBinder binder) {
-        binder.addValidators(fileExtensionValidator);
-    }
+
+
+//    @InitBinder
+//    protected void initBinder(WebDataBinder binder) {
+//        binder.addValidators(fileExtensionValidator);
+//    }
     
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
-    public ResponseEntity<?> createPost(@ModelAttribute @Validated PostEntityRequestDto request, BindingResult bindingResult) {
+    public ResponseEntity<?> createPost(@ModelAttribute PostEntityRequestDto request, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             List<ObjectError> errors = bindingResult.getAllErrors();
             ErrorResponse errorResponse = new ErrorResponse();
@@ -65,7 +57,7 @@ public class PostController {
     
     @DeleteMapping("/{post_id}")
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
-    public ResponseEntity removePost(@PathVariable("post_id") Long postId) {
+    public ResponseEntity<?> removePost(@PathVariable("post_id") Long postId) {
         postService.deletePost(postId);
         return ResponseEntity.ok(HttpStatus.OK);
     }
@@ -80,9 +72,14 @@ public class PostController {
     
     @GetMapping(path = "/user/{user_id}")
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
-    public ResponseEntity<List<PostEntityResponseDto>> getPostByUserId(@PathVariable("user_id") String userId) {
-        List<PostEntity> posts = postService.getPostsByUser(userId);
-        return ResponseEntity.ok(dtoConverter.toPostEntityListDto(posts));
+    public ResponseEntity<PaginatedResponseDto> getPostByUserId(@PathVariable("user_id") String userId,
+                                                                @RequestParam(name = "pageNo", defaultValue = "0") Integer pageNo,
+                                                                @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize) {
+        List<PostEntity> posts = postService.getPostsByUser(userId, pageNo, pageSize);
+        PaginatedResponseDto dto = new PaginatedResponseDto();
+        dto.setCount(posts.size());
+        dto.setResults(dtoConverter.toPostEntityListDto(posts));
+        return ResponseEntity.ok(dto);
     }
     
     @PostMapping(path = "/like")
@@ -94,7 +91,7 @@ public class PostController {
     
     @PostMapping(path = "/unlike")
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
-    public ResponseEntity unlikePost(@RequestBody UnlikeRequestDto requestDto) {
+    public ResponseEntity<?> unlikePost(@RequestBody UnlikeRequestDto requestDto) {
         postService.unlikePost(requestDto);
         return ResponseEntity.ok(HttpStatus.OK);
     }
@@ -102,9 +99,14 @@ public class PostController {
     
     @GetMapping(path = "/{post_id}/comments")
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
-    public ResponseEntity<List<CommentEntityResponseDto>> findAllCommentsOnPost(@PathVariable("post_id") Long postId) {
-        List<CommentEntity> comments = postService.findCommentsByPostId(postId);
-        return ResponseEntity.ok(dtoConverter.toCommentEntityListDto(comments));
+    public ResponseEntity<PaginatedResponseDto> findAllCommentsOnPost(@PathVariable("post_id") Long postId,
+                                                                      @RequestParam(name = "pageNo", defaultValue = "0") Integer pageNo,
+                                                                      @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize) {
+        List<CommentEntity> comments = postService.findCommentsByPostId(postId, pageNo, pageSize);
+        PaginatedResponseDto dto = new PaginatedResponseDto();
+        dto.setCount(comments.size());
+        dto.setResults(dtoConverter.toCommentEntityListDto(comments));
+        return ResponseEntity.ok(dto);
     }
     
     @PostMapping(path = "/comment")
@@ -116,7 +118,7 @@ public class PostController {
     
     @DeleteMapping(path = "/comment/{comment_id}")
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
-    public ResponseEntity deleteComment(@PathVariable("comment_id") Long commentId) {
+    public ResponseEntity<?> deleteComment(@PathVariable("comment_id") Long commentId) {
         postService.deleteComment(commentId);
         return ResponseEntity.ok(HttpStatus.OK);
     }
@@ -130,7 +132,7 @@ public class PostController {
     
     @PostMapping(path = "/comment/unlike")
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN')")
-    public ResponseEntity unlikeComment(@RequestBody UnlikeRequestDto requestDto) {
+    public ResponseEntity<?> unlikeComment(@RequestBody UnlikeRequestDto requestDto) {
         postService.unlikeComment(requestDto);
         return ResponseEntity.ok(HttpStatus.OK);
     }

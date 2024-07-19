@@ -3,6 +3,8 @@ package org.teadev.tunein.service;
 import jakarta.transaction.Transactional;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.teadev.tunein.constants.ErrorMessage;
 import org.teadev.tunein.dto.request.CommentEntityRequestDto;
@@ -70,11 +72,11 @@ public class PostService {
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessage.POST_NOT_FOUND_MESSAGE));
     }
     
-    public List<PostEntity> getPostsByUser(String userId) {
+    public List<PostEntity> getPostsByUser(String userId, Integer pageNo, Integer pageSize) {
         UserEntity user = userService.getUser(userId);
-        
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
         return postRepository
-                .findPostByUser(user)
+                .findPostByUser(user, pageable)
                 .orElse(List.of());
     }
     
@@ -95,9 +97,9 @@ public class PostService {
         likeService.unlikePost(post, user, requestDto);
     }
     
-    public List<CommentEntity> findCommentsByPostId(Long postId) {
+    public List<CommentEntity> findCommentsByPostId(Long postId, Integer pageNo, Integer pageSize) {
         PostEntity postEntity = getPost(postId);
-        return commentService.findCommentsByPost(postEntity);
+        return commentService.findCommentsByPost(postEntity, pageNo, pageSize);
     }
     
     public CommentEntity addComment(CommentEntityRequestDto requestDto) {
