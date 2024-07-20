@@ -15,6 +15,7 @@ import org.teadev.tunein_storage.repository.StorageRepository;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -99,6 +100,12 @@ public class LocalStorageService implements StorageService {
     @Override
     public File getFile(String filePath) {
         return null;
+    }
+    
+    @Override
+    public List<String> listFiles() {
+        String[] files = new File(LOCAL_STORAGE_PATH).list();
+        return List.of(files);
     }
     
 }

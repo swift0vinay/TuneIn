@@ -16,7 +16,6 @@ spring:
       max-request-size: 50MB
 
 server:
-  port: 8085
-
+  port: 6002
 storage:
   root: "E:\\Spring Projects\\TuneIn\\storage"
