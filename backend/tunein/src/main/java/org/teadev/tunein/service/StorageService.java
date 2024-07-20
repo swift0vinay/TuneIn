@@ -1,7 +1,9 @@
 package org.teadev.tunein.service;
 
+import jakarta.annotation.PostConstruct;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -19,11 +21,19 @@ public class StorageService {
     @Autowired
     private RestTemplate restTemplate;
     
-    private final String STORAGE_SERVER_PREFIX = "http://localhost:8085/storage";
+    @Value("${storage.server.url}")
+    private String STORAGE_SERVER_URL;
+    
+    private String STORAGE_SERVER_PREFIX;
+    
+    
+    @PostConstruct
+    public void init() {
+        STORAGE_SERVER_PREFIX = STORAGE_SERVER_URL + "/storage";
+    }
     
     public FileUploadResponse uploadFile(MultipartFile file) {
         final String URL = STORAGE_SERVER_PREFIX.concat("/upload");
-        
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);
         
