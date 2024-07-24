@@ -9,13 +9,14 @@ import {
     CardTitle,
 } from "@/components/ui/card"
 import { Input } from '@/components/ui/input'
+import { useToast } from '@/components/ui/use-toast'
+import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import * as Yup from "yup"
 import Error from "../../components/error"
 import { login } from '../api/authController'
 import useFetch from '../hooks/useFetch'
-import { EyeIcon, EyeOffIcon } from 'lucide-react'
 
 const LoginUser = () => {
 
@@ -30,7 +31,9 @@ const LoginUser = () => {
 
     const [showPassword, setShowPassword] = useState(false);
 
-    const router = useRouter()
+    const router = useRouter();
+
+    const { toast } = useToast();
 
     const handleInputChange = (e) => {
         const { name, value } = e.target
@@ -63,9 +66,20 @@ const LoginUser = () => {
         const result = await validateInputs();
         if (result) {
             await loginFn();
-            router.push("/home");
         }
     };
+
+    useEffect(() => {
+        if (!error && data) {
+            router.push("/home");
+        } else if (error) {
+            toast({
+                title: "Login attempt failed",
+                description: error.message,
+                variant: "destructive"
+            });
+        }
+    }, [error, data]);
 
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
@@ -77,7 +91,6 @@ const LoginUser = () => {
                 <CardTitle className='text-4xl'>
                     Welcome Back!
                 </CardTitle>
-                {error && <Error message={error.message} />}
             </CardHeader>
             <CardContent className='space-y-5'>
                 <Input className='text-1xl' name="username" type='text'
