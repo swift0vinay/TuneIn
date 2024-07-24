@@ -40,6 +40,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(errorResponse);
     }
     
+    @ExceptionHandler(JwtTokenException.class)
+    public ResponseEntity<ErrorResponse> handleTokenExceptions(JwtTokenException exception) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
+        errorResponse.setTitle(exception.getMessage());
+        return ResponseEntity.status(HttpStatus.valueOf(errorResponse.getStatus())).body(errorResponse);
+    }
     
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ErrorResponse> handleRuntimeExceptions(RuntimeException exception) {

@@ -22,3 +22,8 @@ server:
 storage:
   server:
     url: "http://localhost:6002"
+
+security:
+  jwt:
+    secret-key: "bc91a2dc40bc4db2c4db85f3590e011456ee2ba43d1ba5583635d7d6f25e2c70"
+    expiration-time: 3600000
