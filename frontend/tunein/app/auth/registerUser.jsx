@@ -15,7 +15,7 @@ import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import * as Yup from "yup"
-import { register } from '../api/authController'
+import { register } from '../api/auth-controller'
 import useFetch from '../hooks/useFetch'
 
 const RegisterUser = () => {

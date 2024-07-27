@@ -1,11 +1,9 @@
 'use client'
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useRouter } from "next/navigation";
 import LoginUser from './loginUser';
 import RegisterUser from './registerUser';
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { getDataFromLocalStorage, LOCAL_STORAGE_USER_DETAILS } from "../api/localStorageService";
 
 const AuthForm = () => {
 
@@ -13,7 +11,7 @@ const AuthForm = () => {
 
     // TODO: Enable it when required
     // useEffect(() => {
-    //     const userDetails = getDataFromLocalStorage(LOCAL_STORAGE_USER_DETAILS)
+    //     const userDetails = loadJwtToken()
     //     if (userDetails) {
     //         router.replace("/home");
     //     }

@@ -2,27 +2,35 @@
 
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { getDataFromLocalStorage, LOCAL_STORAGE_USER_DETAILS } from '../api/localStorageService'
+import { loadJwtToken } from '../api/jwt-service'
+import { getDataFromLocalStorage, LOCAL_STORAGE_USER_DETAILS } from '../api/local-storage-service'
 
 const HomePage = () => {
 
     const router = useRouter();
 
+    const [token, setToken] = useState({});
     const [userDetails, setUserDetails] = useState({});
 
     useEffect(() => {
-        const userInfo = getDataFromLocalStorage(LOCAL_STORAGE_USER_DETAILS);
-        if (!userInfo) {
+        const userToken = loadJwtToken();
+        if (!userToken) {
             router.push("/auth");
             return;
         }
-        setUserDetails(userInfo);
+        setToken(userToken);
+        const userDetails = getDataFromLocalStorage(LOCAL_STORAGE_USER_DETAILS);
+        if (!userDetails) {
+            router.push("/auth");
+            return;
+        }
+        setUserDetails(userDetails);
     }, []);
 
 
     return (
         <div>
-            <h1>{userDetails && userDetails.username}</h1>
+            <h1>{userDetails.id}</h1>
         </div>
     )
 }

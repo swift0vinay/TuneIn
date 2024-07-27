@@ -15,7 +15,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import * as Yup from "yup"
 import Error from "../../components/error"
-import { login } from '../api/authController'
+import { login } from '../api/auth-controller'
 import useFetch from '../hooks/useFetch'
 
 const LoginUser = () => {

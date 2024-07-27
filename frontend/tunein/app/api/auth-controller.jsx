@@ -1,10 +1,11 @@
 import { LOGIN_URL, REGISTER_URL } from "./api-info";
-import { LOCAL_STORAGE_USER_DETAILS, saveDataToLocalStorage } from "./localStorageService";
-
-// Default 10 min
-const DEFAULT_TTL = 600000;
+import { removeJwtToken, saveJwtToken } from "./jwt-service";
+import { LOCAL_STORAGE_USER_DETAILS, removeDataFromLocalStorage, saveDataToLocalStorage } from "./local-storage-service";
 
 export async function register(userDetails) {
+    removeJwtToken();
+    removeDataFromLocalStorage(LOCAL_STORAGE_USER_DETAILS);
+
     const response = await fetch(REGISTER_URL, {
         method: "POST",
         headers: {
@@ -21,15 +22,19 @@ export async function register(userDetails) {
     }
 
     const userData = await response.json();
-    userDetails = {
-        ...userDetails,
+    const data = {
         "id": userData.id
     };
-    saveDataToLocalStorage(LOCAL_STORAGE_USER_DETAILS, userDetails, DEFAULT_TTL);
-    return userData;
+
+    saveJwtToken(userData.token);
+    saveDataToLocalStorage(LOCAL_STORAGE_USER_DETAILS, data);
+    return data;
 }
 
 export async function login(userDetails) {
+    removeJwtToken();
+    removeDataFromLocalStorage(LOCAL_STORAGE_USER_DETAILS);
+
     const response = await fetch(LOGIN_URL, {
         method: "POST",
         headers: {
@@ -46,10 +51,11 @@ export async function login(userDetails) {
     }
 
     const userData = await response.json();
-    userDetails = {
-        ...userDetails,
+    const data = {
         "id": userData.id
     };
-    saveDataToLocalStorage(LOCAL_STORAGE_USER_DETAILS, userDetails, DEFAULT_TTL);
+
+    saveJwtToken(userData.token);
+    saveDataToLocalStorage(LOCAL_STORAGE_USER_DETAILS, data);
     return userData;
 }
